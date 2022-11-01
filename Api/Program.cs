@@ -1,6 +1,7 @@
 using Api;
 using Api.Configs;
 using Api.Services;
+using DAL;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -82,6 +83,7 @@ internal class Program
                 IssuerSigningKey = authConfig.SymmetricSecurityKey(),
                 ClockSkew = TimeSpan.Zero,
             };
+            
         });
 
         builder.Services.AddAuthorization(o =>
@@ -116,7 +118,7 @@ internal class Program
 
         app.UseAuthentication();
         app.UseAuthorization();
-
+        app.UseTokenValidator();
         app.MapControllers();
 
         app.Run();
