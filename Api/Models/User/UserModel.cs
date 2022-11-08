@@ -1,6 +1,6 @@
 ﻿using System.Xml.Linq;
 
-namespace Api.Models
+namespace Api.Models.User
 {
     public class UserModel
     {

@@ -67,6 +67,7 @@ internal class Program
 
         builder.Services.AddScoped<UserService>();
         builder.Services.AddScoped<AuthService>();
+        builder.Services.AddScoped<PostService>();
 
         builder.Services.AddAuthentication(o =>
         {

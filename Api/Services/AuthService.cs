@@ -1,6 +1,6 @@
 ﻿using Api.Configs;
 using Api.Consts;
-using Api.Models;
+using Api.Models.Token;
 using AutoMapper;
 using Common;
 using DAL;

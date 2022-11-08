@@ -6,16 +6,15 @@ using System.Threading.Tasks;
 
 namespace DAL.Entities
 {
-    public class Attach
+    public class Post
     {
         public Guid Id { get; set; }
-        public string Name { get; set; } = null!;
-        public string MimeType { get; set; } = null!;
-        public string FilePath { get; set; } = null!;
-        public long Size { get; set; }
-
+        public string? Description { get; set; }
         public Guid AuthorId { get; set; }
         public virtual User Author { get; set; } = null!;
+        public DateTimeOffset Created { get; set; }
+
+        public virtual ICollection<PostContent>? PostContents { get; set; }
 
     }
 }

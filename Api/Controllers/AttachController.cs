@@ -1,4 +1,4 @@
-﻿using Api.Models;
+﻿using Api.Models.Attach;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
