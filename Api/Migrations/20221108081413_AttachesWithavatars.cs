@@ -1,6 +1,5 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
-using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
@@ -12,18 +11,11 @@ namespace Api.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<long>(
-                name: "AvatarId",
-                table: "Users",
-                type: "bigint",
-                nullable: true);
-
             migrationBuilder.CreateTable(
                 name: "Attaches",
                 columns: table => new
                 {
-                    Id = table.Column<long>(type: "bigint", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Name = table.Column<string>(type: "text", nullable: false),
                     MimeType = table.Column<string>(type: "text", nullable: false),
                     FilePath = table.Column<string>(type: "text", nullable: false),
@@ -45,7 +37,8 @@ namespace Api.Migrations
                 name: "Avatars",
                 columns: table => new
                 {
-                    Id = table.Column<long>(type: "bigint", nullable: false)
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    OwnerId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -56,47 +49,34 @@ namespace Api.Migrations
                         principalTable: "Attaches",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Avatars_Users_OwnerId",
+                        column: x => x.OwnerId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Users_AvatarId",
-                table: "Users",
-                column: "AvatarId",
-                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Attaches_AuthorId",
                 table: "Attaches",
                 column: "AuthorId");
 
-            migrationBuilder.AddForeignKey(
-                name: "FK_Users_Avatars_AvatarId",
-                table: "Users",
-                column: "AvatarId",
-                principalTable: "Avatars",
-                principalColumn: "Id");
+            migrationBuilder.CreateIndex(
+                name: "IX_Avatars_OwnerId",
+                table: "Avatars",
+                column: "OwnerId",
+                unique: true);
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropForeignKey(
-                name: "FK_Users_Avatars_AvatarId",
-                table: "Users");
-
             migrationBuilder.DropTable(
                 name: "Avatars");
 
             migrationBuilder.DropTable(
                 name: "Attaches");
-
-            migrationBuilder.DropIndex(
-                name: "IX_Users_AvatarId",
-                table: "Users");
-
-            migrationBuilder.DropColumn(
-                name: "AvatarId",
-                table: "Users");
         }
     }
 }

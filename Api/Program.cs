@@ -1,5 +1,6 @@
 using Api;
 using Api.Configs;
+using Api.Middlewares;
 using Api.Services;
 using DAL;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -65,6 +66,7 @@ internal class Program
         builder.Services.AddAutoMapper(typeof(MapperProfile).Assembly);
 
         builder.Services.AddScoped<UserService>();
+        builder.Services.AddScoped<AuthService>();
 
         builder.Services.AddAuthentication(o =>
         {
@@ -94,6 +96,8 @@ internal class Program
                 p.RequireAuthenticatedUser();
             });
         });
+
+        
 
         var app = builder.Build();
 
