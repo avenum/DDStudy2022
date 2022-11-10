@@ -64,7 +64,7 @@ namespace Api.Services
         {
             var posts = await _context.Posts
                 .Include(x => x.Author).ThenInclude(x => x.Avatar)
-                .Include(x => x.PostContents).AsNoTracking().Take(take).Skip(skip).ToListAsync();
+                .Include(x => x.PostContents).AsNoTracking().OrderByDescending(x=>x.Created).Skip(skip).Take(take).ToListAsync();
 
             var res = posts.Select(post =>
                 new PostModel
