@@ -9,6 +9,7 @@ namespace Api.Controllers
 {
     [Route("api/[controller]/[action]")]
     [ApiController]
+    [ApiExplorerSettings(GroupName ="Auth")]
     public class AuthController : ControllerBase
     {
         private readonly AuthService _authService;

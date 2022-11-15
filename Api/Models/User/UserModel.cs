@@ -8,8 +8,7 @@ namespace Api.Models.User
         public string Name { get; set; } = null!;
         public string Email { get; set; } = null!;
         public DateTimeOffset BirthDate { get; set; }
-
-
+        public int PostsCount { get; set; }
     }
 
     public class UserAvatarModel : UserModel

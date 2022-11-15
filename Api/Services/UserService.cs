@@ -1,4 +1,5 @@
 ﻿using Api.Configs;
+using Api.Exceptions;
 using Api.Models.Attach;
 using Api.Models.User;
 using AutoMapper;
@@ -15,11 +16,6 @@ namespace Api.Services
     {
         private readonly IMapper _mapper;
         private readonly DataContext _context;
-        private Func<User, string?>? _linkGenerator;
-        public void SetLinkGenerator(Func<User, string?> linkGenerator)
-        {
-            _linkGenerator = linkGenerator;
-        }
 
 
         public UserService(IMapper mapper, DataContext context)
@@ -76,25 +72,23 @@ namespace Api.Services
             return t.Entity.Id;
         }
         public async Task<IEnumerable<UserAvatarModel>> GetUsers() =>
-            (await _context.Users.AsNoTracking().Include(x => x.Avatar).ToListAsync())
-                .Select(x => _mapper.Map<User, UserAvatarModel>(x, o => o.AfterMap(FixAvatar)));
+            await _context.Users.AsNoTracking()
+            .Include(x => x.Avatar)
+            .Include(x => x.Posts)
+            .Select(x => _mapper.Map<UserAvatarModel>(x))
+            .ToListAsync();
 
 
         public async Task<UserAvatarModel> GetUser(Guid id) =>
-            _mapper.Map<User, UserAvatarModel>(await GetUserById(id), o => o.AfterMap(FixAvatar));
+            _mapper.Map<User, UserAvatarModel>(await GetUserById(id));
 
 
-
-        private void FixAvatar(User s, UserAvatarModel d)
-        {
-            d.AvatarLink = s.Avatar == null ? null : _linkGenerator?.Invoke(s);
-        }
 
         private async Task<User> GetUserById(Guid id)
         {
-            var user = await _context.Users.Include(x => x.Avatar).FirstOrDefaultAsync(x => x.Id == id);
+            var user = await _context.Users.Include(x => x.Avatar).Include(x => x.Posts).FirstOrDefaultAsync(x => x.Id == id);
             if (user == null || user == default)
-                throw new Exception("user not found");
+                throw new UserNotFoundException();
             return user;
         }
     }

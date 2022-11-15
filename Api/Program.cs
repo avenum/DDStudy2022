@@ -1,5 +1,5 @@
-using Api;
 using Api.Configs;
+using Api.Mapper;
 using Api.Middlewares;
 using Api.Services;
 using DAL;
@@ -54,6 +54,9 @@ internal class Program
                     new List<string>()
                 }
             });
+
+            c.SwaggerDoc("Auth", new OpenApiInfo { Title = "Auth" });
+            c.SwaggerDoc("Api", new OpenApiInfo { Title = "Api" });
         });
 
         builder.Services.AddDbContext<DAL.DataContext>(options =>
@@ -61,13 +64,14 @@ internal class Program
             options.UseNpgsql(builder.Configuration.GetConnectionString("PostgreSql"), sql => { });
         }, contextLifetime: ServiceLifetime.Scoped);
 
-     
+
 
         builder.Services.AddAutoMapper(typeof(MapperProfile).Assembly);
 
         builder.Services.AddScoped<UserService>();
         builder.Services.AddScoped<AuthService>();
         builder.Services.AddScoped<PostService>();
+        builder.Services.AddScoped<LinkGeneratorService>();
 
         builder.Services.AddAuthentication(o =>
         {
@@ -86,7 +90,7 @@ internal class Program
                 IssuerSigningKey = authConfig.SymmetricSecurityKey(),
                 ClockSkew = TimeSpan.Zero,
             };
-            
+
         });
 
         builder.Services.AddAuthorization(o =>
@@ -98,7 +102,7 @@ internal class Program
             });
         });
 
-        
+
 
         var app = builder.Build();
 
@@ -116,7 +120,11 @@ internal class Program
         //if (app.Environment.IsDevelopment())
         {
             app.UseSwagger();
-            app.UseSwaggerUI();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("Api/swagger.json", "Api");
+                c.SwaggerEndpoint("Auth/swagger.json", "Auth");
+            });
         }
 
         app.UseHttpsRedirection();
@@ -124,6 +132,7 @@ internal class Program
         app.UseAuthentication();
         app.UseAuthorization();
         app.UseTokenValidator();
+        app.UseGlobalErrorWrapper();
         app.MapControllers();
 
         app.Run();
