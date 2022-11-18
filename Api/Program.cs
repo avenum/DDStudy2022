@@ -2,11 +2,15 @@ using Api.Configs;
 using Api.Mapper;
 using Api.Middlewares;
 using Api.Services;
+using AspNetCoreRateLimit;
 using DAL;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+
 
 internal class Program
 {
@@ -65,6 +69,12 @@ internal class Program
         }, contextLifetime: ServiceLifetime.Scoped);
 
 
+        builder.Services.AddOptions();
+        builder.Services.AddMemoryCache();
+        builder.Services.Configure<ClientRateLimitOptions>(builder.Configuration.GetSection("ClientRateLimiting"));
+        builder.Services.Configure<ClientRateLimitPolicies>(builder.Configuration.GetSection("ClientRateLimitPolicies"));
+        builder.Services.AddInMemoryRateLimiting();
+        builder.Services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
 
         builder.Services.AddAutoMapper(typeof(MapperProfile).Assembly);
 
@@ -72,6 +82,7 @@ internal class Program
         builder.Services.AddScoped<AuthService>();
         builder.Services.AddScoped<PostService>();
         builder.Services.AddScoped<LinkGeneratorService>();
+        //builder.Services.AddSingleton<DdosGuard>();
 
         builder.Services.AddAuthentication(o =>
         {
@@ -107,6 +118,9 @@ internal class Program
         var app = builder.Build();
 
 
+        
+
+
         using (var serviceScope = ((IApplicationBuilder)app).ApplicationServices.GetService<IServiceScopeFactory>()?.CreateScope())
         {
             if (serviceScope != null)
@@ -129,11 +143,17 @@ internal class Program
 
         app.UseHttpsRedirection();
 
+        
         app.UseAuthentication();
+        
+        app.UseClientRateLimiting();
+
         app.UseAuthorization();
         app.UseTokenValidator();
         app.UseGlobalErrorWrapper();
         app.MapControllers();
+
+        
 
         app.Run();
     }
