@@ -11,7 +11,7 @@ namespace Api.Controllers
 {
     [Route("api/[controller]/[action]")]
     [ApiController]
-
+    [Authorize]
     [ApiExplorerSettings(GroupName = "Api")]
     public class UserController : ControllerBase
     {

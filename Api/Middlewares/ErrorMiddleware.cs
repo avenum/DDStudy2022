@@ -27,8 +27,15 @@ namespace Api.Middlewares
                 await context.Response.WriteAsJsonAsync(ex.Message);
                 //await context.Response.CompleteAsync()
             }
-           
-            
+
+            catch (HttpRequestException ex)
+            {
+                if (ex.StatusCode != null)
+                    context.Response.StatusCode = (int)ex.StatusCode;
+                await context.Response.WriteAsJsonAsync(ex.Message);
+            }
+
+
         }
     }
     public static class ErrorMiddlewareExtensions
