@@ -17,5 +17,6 @@ namespace DAL.Entities
         public virtual Avatar? Avatar { get; set; }
         public virtual ICollection<UserSession>? Sessions { get; set; }
         public virtual ICollection<Post>? Posts { get; set; }
+        public string? PushToken { get; set; }
     }
 }

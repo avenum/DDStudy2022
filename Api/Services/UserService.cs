@@ -82,6 +82,21 @@ namespace Api.Services
         public async Task<UserAvatarModel> GetUser(Guid id) =>
             _mapper.Map<User, UserAvatarModel>(await GetUserById(id));
 
+        public async Task SetPushToken(Guid userId, string? token = null)
+        {
+            var user = await GetUserById(userId);
+            user.PushToken = token;
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<string?> getPushToken(Guid userId)
+        {
+            var user = await GetUserById(userId);
+            return user.PushToken;
+           
+        }
+
+
 
 
         private async Task<User> GetUserById(Guid id)

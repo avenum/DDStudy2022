@@ -20,10 +20,12 @@ internal class Program
 
         // Add services to the container.
         var authSection = builder.Configuration.GetSection(AuthConfig.Position);
+       
         var authConfig = authSection.Get<AuthConfig>();
 
 
         builder.Services.Configure<AuthConfig>(authSection);
+        builder.Services.Configure<PushConfig>(builder.Configuration.GetSection(PushConfig.Position));
 
         builder.Services.AddControllers();
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -79,6 +81,7 @@ internal class Program
         builder.Services.AddAutoMapper(typeof(MapperProfile).Assembly);
 
         builder.Services.AddScoped<UserService>();
+        builder.Services.AddScoped<GooglePushService>();
         builder.Services.AddScoped<AuthService>();
         builder.Services.AddScoped<PostService>();
         builder.Services.AddScoped<LinkGeneratorService>();
